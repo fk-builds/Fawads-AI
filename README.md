@@ -1,5 +1,7 @@
 # Fawad's AI — Android AI Voice Assistant
 
+[![Android CI](https://github.com/fk-builds/Fawads-AI/actions/workflows/android-ci.yml/badge.svg)](https://github.com/fk-builds/Fawads-AI/actions/workflows/android-ci.yml)
+
 A production-ready **Android AI Voice Assistant** built in **Kotlin + MVVM**, powered by the **Google Gemini Live API over WebSocket** with **native PCM audio**. Renamed from MYRA → **Fawad's AI** across the whole app.
 
 > ✅ **Every push to this repo is built automatically by GitHub Actions.**
