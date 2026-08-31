@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer orb (red) -->
+    <path
+        android:fillColor="#C9A24B"
+        android:pathData="M54,24A30,30 0,1 0,54 84A30,30 0,1 0,54 24z" />
+    <!-- Mid orb (purple) -->
+    <path
+        android:fillColor="#B8934A"
+        android:pathData="M54,36A18,18 0,1 0,54 72A18,18 0,1 0,54 36z" />
+    <!-- Core (dark) -->
+    <path
+        android:fillColor="#12060B"
+        android:pathData="M54,46A8,8 0,1 0,54 62A8,8 0,1 0,54 46z" />
+    <!-- Specular highlight -->
+    <path
+        android:fillColor="#80FFFFFF"
+        android:pathData="M42,38A7,7 0,1 0,42 52A7,7 0,1 0,42 38z" />
+</vector>

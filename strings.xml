@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fawad\'s AI</string>
+    <string name="app_subtitle">AI Companion</string>
+    <string name="accessibility_description">Fawad\'s AI needs accessibility to open, close and control apps, and to tap on buttons for you.</string>
+
+    <string name="hello">Hello</string>
+    <string name="battery">Battery</string>
+    <string name="ram">RAM</string>
+</resources>

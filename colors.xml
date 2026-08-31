@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_dark">#0D0B08</color>
+    <color name="bg_black">#000000</color>
+    <color name="accent_red">#C9A24B</color>
+    <color name="accent_pink">#D6B87E</color>
+    <color name="accent_purple">#B8934A</color>
+    <color name="card_bg">#15120E</color>
+    <color name="card_bg_hover">#1E1A15</color>
+    <color name="prime_card">#1A1206</color>
+    <color name="text_primary">#EEEAE2</color>
+    <color name="text_secondary">#A79F90</color>
+    <color name="text_hint">#6B665D</color>
+    <color name="success">#6FA36B</color>
+    <color name="error">#C96A5A</color>
+    <color name="warning">#D6B87E</color>
+    <color name="overlay_red">#C9A24B</color>
+    <color name="orb_idle_1">#8F6F33</color>
+    <color name="orb_idle_2">#5C471F</color>
+    <color name="orb_listen_1">#C9A24B</color>
+    <color name="orb_listen_2">#D6B87E</color>
+    <color name="orb_speak_1">#E3C87B</color>
+    <color name="orb_speak_2">#C9A24B</color>
+    <color name="orb_thinking_1">#B8934A</color>
+    <color name="orb_thinking_2">#D6B87E</color>
+
+    <!-- Launcher adaptive icon -->
+    <color name="ic_launcher_background">#12060B</color>
+</resources>
