@@ -1,8 +1,13 @@
 # Fawad's AI — Android AI Voice Assistant
 
+[![Android CI](https://github.com/fk-builds/Fawads-AI/actions/workflows/android-ci.yml/badge.svg)](https://github.com/fk-builds/Fawads-AI/actions/workflows/android-ci.yml)
+
 A production-ready **Android AI Voice Assistant** built in **Kotlin + MVVM**, powered by the **Google Gemini Live API over WebSocket** with **native PCM audio**. Renamed from MYRA → **Fawad's AI** across the whole app.
 
-> ⚠️ **You build the APK yourself** from this source in *Android Studio*. I can't compile a native `.apk` in this sandbox (no Android SDK), but everything here is ready to build.
+> ✅ **Every push to this repo is built automatically by GitHub Actions.**
+> After each run you can download ready-to-install **debug & release APKs** from
+> **Repository → Actions tab → (latest run) → Artifacts**.
+> You can also build locally in *Android Studio* (see below).
 
 ---
 
@@ -67,6 +72,19 @@ FawadsAI/
 ---
 
 ## 🛠️ Build the APK
+
+### Option A — GitHub Actions (automatic, no setup)
+
+1. Push any change to this repository (or open a PR).
+2. Go to the **Actions** tab → **Android CI** workflow → wait for the ✅ check.
+3. Download the artifacts:
+   - **`FawadsAI-debug`** → `app-debug.apk` (fast, for testing)
+   - **`FawadsAI-release`** → `app-release.apk` (minified; currently signed with the debug key)
+4. (Optional) Build on demand: **Actions → Android CI → Run workflow**.
+
+The CI job: JDK 17 (Temurin) → Gradle wrapper 8.5 → AGP 8.2.2 + Kotlin 1.9.22 → `assembleDebug assembleRelease` → uploads both APKs as artifacts (kept 90 days).
+
+### Option B — Android Studio (local)
 
 1. **Open Android Studio** → *File → Open* → choose the **FawadsAI** folder.
 2. Let Gradle **sync** (it auto-downloads the bundled Gradle + dependencies — needs internet on first run).
