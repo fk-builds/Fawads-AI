@@ -1,11 +1,16 @@
-# GitHub Actions — automatically builds the Fawad's AI app on every push/PR.
-# After a successful run, download the APKs from:
-#   Repository → Actions → (run) → Artifacts
-name: Android CI
+# GitHub Actions — OPTIONAL manual build of the Fawad's AI app.
+# This is NOT how the app is normally built anymore (see the note below).
+# If you do run it, the APKs land in: Repository → Actions → (run) → Artifacts
+name: Android CI (manual only)
+
+# NOTE: APK build ka primary tareeqa ab CI nahi — phone par build hota hai:
+#   docs/APK-PHONE-SETUP.md   (scripts/phone-setup.sh + scripts/phone-build.sh)
+#
+# Ye workflow is liye `workflow_dispatch`-only kar diya gaya hai taake har push par
+# GitHub par kharcha/noise na ho. Jab kabhi CI se build karna ho:
+#   Actions → Android CI → "Run workflow" (dobara `--check` karne ki zaroorat nahi).
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:

@@ -71,37 +71,69 @@ FawadsAI/
 
 ---
 
-## 🛠️ Build the APK
+## 🛠️ Build the APK — **from your phone only** (no PC, no Android Studio, no CI)
 
-### Option A — GitHub Actions (automatic, no setup)
+The APK is built **on the Android device itself**, in Termux. One phone is enough.
+Full guide: **[`docs/APK-PHONE-SETUP.md`](docs/APK-PHONE-SETUP.md)**
 
-1. Push any change to this repository (or open a PR).
-2. Go to the **Actions** tab → **Android CI** workflow → wait for the ✅ check.
-3. Download the artifacts:
-   - **`FawadsAI-debug`** → `app-debug.apk` (fast, for testing)
-   - **`FawadsAI-release`** → `app-release.apk` (minified; currently signed with the debug key)
-4. (Optional) Build on demand: **Actions → Android CI → Run workflow**.
+```bash
+# in Termux (from F-Droid), after `termux-setup-storage`:
+git clone https://github.com/fk-builds/Fawads-AI.git
+cd Fawads-AI
+bash scripts/phone-setup.sh        # once: JDK + arm64 Android build-tools + SDK 34
+bash scripts/make-keystore.sh      # once: your release signing key
+bash scripts/phone-build.sh        # → /sdcard/Download/FawadsAI-latest.apk
+```
 
-The CI job: JDK 17 (Temurin) → Gradle wrapper 8.5 → AGP 8.2.2 + Kotlin 1.9.22 → `assembleDebug assembleRelease` → uploads both APKs as artifacts (kept 90 days).
+- The APK is **universal**: it installs and runs on every Android 8+ phone (arm64 / x86_64).
+  No device binding, no license check — anyone you send the file to can install it.
+- The layouts are size-token driven (`values/`, `values-h640dp`, `values-h900dp`, `values-sw600dp`),
+  so small phones, tall phones, tablets and unfolded foldables all fit without clipping.
+- Updates go out **Play-Store-style** without the Play Store: the app checks your `release.json`,
+  downloads the new APK, verifies SHA-256 and opens the installer → `docs/AUTO-UPDATES.md`
+- Want the real Play Store instead? `bash scripts/phone-build.sh --play` makes the `.aab`
+  → `docs/PLAYSTORE.md`
 
-### Option B — Android Studio (local)
+> **Why `aapt2` needs a patch:** Google's official SDK ships x86_64 build-tools, which cannot
+> execute on an arm64 phone. `scripts/phone-setup.sh` installs the aarch64-patched build-tools from
+> [AndroidIDEOfficial/androidide-tools](https://github.com/AndroidIDEOfficial/androidide-tools)
+> (verified against pinned SHA-256) and points Gradle at them via a **user-level**
+> `~/.gradle/gradle.properties` override — never committed, so PC builds stay untouched.
 
-1. **Open Android Studio** → *File → Open* → choose the **FawadsAI** folder.
-2. Let Gradle **sync** (it auto-downloads the bundled Gradle + dependencies — needs internet on first run).
-3. (Optional) In *File → Project Structure → SDK Location*, make sure the SDK path is set.
-4. **Build a debug APK:**
-   - Menu → **Build → Build Bundle(s) / APK(s) → Build APK(s)**
-   - The APK is at: `app/build/outputs/apk/debug/app-debug.apk`
-5. **Or run from the terminal:**
-   ```bash
-   # macOS / Linux
-   ./gradlew assembleDebug
-   # Windows
-   gradlew.bat assembleDebug
-   ```
-6. Install: copy `app-debug.apk` to your phone and enable **"Install unknown apps"**, or connect the phone and press ▶ Run.
+<details>
+<summary>Optional: build with Android Studio on a PC (same commands as the phone script)</summary>
 
-> For a **release** APK you'd set up your own signing key. The provided `release` build type currently signs with the debug key so you can test quickly — don't publish that.
+```bash
+./gradlew assembleRelease          # or assembleDebug, or --both style below
+./gradlew assembleDebug assembleRelease
+./gradlew bundleRelease            # .aab for Play Console
+```
+
+Output: `app/build/outputs/apk/release/app-release.apk`. `local.properties` must point at your SDK
+(`sdk.dir=/path/to/Android/sdk`); the release build picks up `keystore.properties` when present and
+falls back to the debug key (with a warning) when it is not.
+
+</details>
+
+<details>
+<summary>Optional: GitHub Actions (manual only, off by default)</summary>
+
+`.github/workflows/android-ci.yml` still exists but is now `workflow_dispatch`-only, so pushes no
+longer build on GitHub. To use it: **Actions → Android CI → Run workflow → Artifacts**
+(`FawadsAI-debug`, `FawadsAI-release`, kept 90 days).
+
+</details>
+
+---
+
+## 🔑 Get a Gemini API key (free)
+
+1. Go to **https://aistudio.google.com/apikey**
+2. Sign in with your Google account → **Create API key**
+3. Copy the key. You'll paste it **inside the app**: Settings → **Gemini API Key**.
+
+> The key enters the app at runtime (stored in EncryptedSharedPreferences) and is never committed
+> to the source — so the APK you share contains no secrets of yours.
 
 ---
 

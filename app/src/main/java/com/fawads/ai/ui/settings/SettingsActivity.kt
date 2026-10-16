@@ -20,6 +20,8 @@ import com.fawads.ai.R
 import com.fawads.ai.databinding.ActivitySettingsBinding
 import com.fawads.ai.service.AccessibilityHelperService
 import com.fawads.ai.util.Prefs
+import com.fawads.ai.util.UpdateManager
+import com.fawads.ai.util.checkForUpdates
 import com.fawads.ai.util.PrimeContact
 
 class SettingsActivity : AppCompatActivity() {
@@ -41,8 +43,24 @@ class SettingsActivity : AppCompatActivity() {
         setupAccessibility()
         setupSecurity()
         setupHandsFree()
+        setupUpdates()
 
         binding.saveButton.setOnClickListener { save() }
+    }
+
+    private fun setupUpdates() {
+        binding.updateUrlInput.setText(prefs.updateFeedUrl)
+        binding.autoUpdateSwitch.isChecked = prefs.autoUpdateChecks
+        val code = UpdateManager.currentVersionCode(this)
+        binding.updateVersionText.text =
+            "v" + UpdateManager.currentVersionName(this) + "  (build " + code + ")" +
+            if (UpdateManager.isEnabled(this)) "" else "  •  updates OFF"
+        binding.updateCheckBtn.setOnClickListener {
+            prefs.updateFeedUrl = binding.updateUrlInput.text?.toString()?.trim().orEmpty()
+            prefs.autoUpdateChecks = binding.autoUpdateSwitch.isChecked
+            prefs.skippedVersionCode = -1
+            checkForUpdates(manual = true)
+        }
     }
 
     private fun setupSecurity() {

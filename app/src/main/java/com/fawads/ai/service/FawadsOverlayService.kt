@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
@@ -16,6 +17,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import com.fawads.ai.R
 import com.fawads.ai.ui.main.MainActivity
 
@@ -38,8 +40,41 @@ class FawadsOverlayService : Service() {
         super.onCreate()
         isRunning = true
         createChannel()
-        startForeground(102, buildNotification())
+        startInForegroundSafely()
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    }
+
+    /**
+     * Android 14+ is strict about foreground-service types: a service that keeps the mic
+     * alive must declare `microphone`, but a `microphone` FGS may not be *started* from the
+     * background (double-press power / boot). So: try the full type set, and if the system
+     * refuses, fall back to dataSync so the orb still appears instead of the service dying.
+     */
+    private fun startInForegroundSafely() {
+        val notification = buildNotification()
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceCompat.startForeground(
+                    this, 102, notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
+            } else {
+                startForeground(102, notification)
+            }
+        } catch (e: Exception) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ServiceCompat.startForeground(
+                        this, 102, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                    )
+                } else {
+                    startForeground(102, notification)
+                }
+            } catch (e2: Exception) {
+                stopSelf()
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

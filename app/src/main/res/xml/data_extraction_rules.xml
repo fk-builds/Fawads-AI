@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ backup rules. The Gemini key + PIN/face data are deliberately
+     NOT backed up (a key must never leave the device); the friendly settings
+     (name, model, voice, personality, wake word, prime contacts) ARE, so a
+     new phone restored from Google One gets the same app feel — like the
+     Play Store experience users expect. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="fawads_ai_prefs.xml" />
+        <exclude domain="sharedpref" path="fawads_ai_secure_prefs.xml" />
+        <exclude domain="file" path="encrypted-data/" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="fawads_ai_prefs.xml" />
+        <exclude domain="sharedpref" path="fawads_ai_secure_prefs.xml" />
+        <exclude domain="file" path="encrypted-data/" />
+    </device-transfer>
+</data-extraction-rules>

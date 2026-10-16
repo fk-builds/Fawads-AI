@@ -2,9 +2,45 @@
 <resources>
     <string name="app_name">Fawad\'s AI</string>
     <string name="app_subtitle">AI Companion</string>
+    <string name="app_subtitle_caps">AI COMPANION</string>
     <string name="accessibility_description">Fawad\'s AI needs accessibility to open, close and control apps, and to tap on buttons for you.</string>
 
     <string name="hello">Hello</string>
     <string name="battery">Battery</string>
     <string name="ram">RAM</string>
+
+    <!-- Main screen -->
+    <string name="settings">Settings</string>
+    <string name="microphone">Microphone</string>
+    <string name="dash">--</string>
+    <string name="ram_dash">RAM --</string>
+    <string name="time_placeholder">--:--</string>
+    <string name="status_hint">Tap karke bolo 💬</string>
+    <string name="mic_hint">Long press to stop</string>
+
+    <!-- Updates (Play-Store-style in-app updater) -->
+    <string name="updates_title">Updates</string>
+    <string name="updates_subtitle">Self-update like the Play Store — point it at your own release.json.</string>
+    <string name="updates_current">Installed version</string>
+    <string name="updates_feed_hint">Update feed URL (release.json) — khali = updates off</string>
+    <string name="updates_auto">Auto-check (12 hr)</string>
+    <string name="updates_check">CHECK FOR UPDATES</string>
+    <string name="update_available_title">Update available 🎉</string>
+    <string name="update_download">Update lo</string>
+    <string name="update_later">Baad me</string>
+    <string name="update_skip">Skip</string>
+    <string name="update_up_to_date">Aap latest version par ho ✓ (v%1$s)</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_ready">Download complete — installing…</string>
+    <string name="update_permission_title">Install permission chahiye</string>
+    <string name="update_permission_message">Fawad\'s AI ko is APK ko install karne ki permission deni hogi (Settings → Install unknown apps).</string>
+    <string name="update_open_settings">Open settings</string>
+    <string name="update_channel_name">Updates</string>
+    <string name="update_no_feed">Update feed set nahi hai — Settings → Updates me release.json ka URL daalein.</string>
+    <string name="update_failed">Update check fail: %1$s</string>
+    <string name="update_install_failed">Installer open nahi ho saka — dist/APK manually install karein.</string>
+    <string name="update_force_note">Ye update zaroori hai (forceUpdate).</string>
+    <string name="updates_feed_label">Update feed URL</string>
+    <string name="updates_enable_note">Is app ko "install unknown apps" ki permission deni paregi (sirf ek baar).</string>
 </resources>

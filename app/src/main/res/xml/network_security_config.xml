@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- HTTPS everywhere: Gemini Live runs on wss://, the public APIs we call are
+     https. Cleartext is off so the app passes Play's network review and is safe
+     on public Wi-Fi. Debug builds keep cleartext so you can test an update feed
+     on a local http:// URL if you ever want to. -->
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </base-config>
+
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
 </network-security-config>

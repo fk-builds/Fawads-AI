@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and below auto-backup rules (Android 12+ uses
+     data_extraction_rules.xml). Same policy: no secrets leave the phone. -->
+<full-backup-content>
+    <include domain="sharedpref" path="fawads_ai_prefs.xml" />
+    <exclude domain="sharedpref" path="fawads_ai_secure_prefs.xml" />
+    <exclude domain="file" path="encrypted-data/" />
+    <exclude domain="external" />
+</full-backup-content>
