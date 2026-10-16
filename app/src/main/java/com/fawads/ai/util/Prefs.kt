@@ -84,6 +84,25 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean(KEY_FACE_ENROLLED, false)
         set(value) = prefs.edit().putBoolean(KEY_FACE_ENROLLED, value).apply()
 
+    // ----- Auto-updates (Play-Store-style self update) -----
+    /** URL of release.json. Blank = updater disabled (default, nothing phones home). */
+    var updateFeedUrl: String
+        get() = prefs.getString(KEY_UPDATE_URL, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_UPDATE_URL, value).apply()
+
+    var autoUpdateChecks: Boolean
+        get() = prefs.getBoolean(KEY_UPDATE_AUTO, true)
+        set(value) = prefs.edit().putBoolean(KEY_UPDATE_AUTO, value).apply()
+
+    /** "Skip this version" — remembered per versionCode. */
+    var skippedVersionCode: Int
+        get() = prefs.getInt(KEY_UPDATE_SKIPPED, -1)
+        set(value) = prefs.edit().putInt(KEY_UPDATE_SKIPPED, value).apply()
+
+    var lastUpdateCheckMs: Long
+        get() = prefs.getLong(KEY_UPDATE_LAST_CHECK, 0L)
+        set(value) = prefs.edit().putLong(KEY_UPDATE_LAST_CHECK, value).apply()
+
     // ----- Hands-free / continuous mode -----
     var handsFree: Boolean
         get() = prefs.getBoolean(KEY_HANDS_FREE, false)
@@ -134,6 +153,10 @@ class Prefs(context: Context) {
         private const val KEY_USE_FACE = "use_face"
         private const val KEY_FACE_DESC = "face_desc"
         private const val KEY_FACE_ENROLLED = "face_enrolled"
+        private const val KEY_UPDATE_URL = "update_feed_url"
+        private const val KEY_UPDATE_AUTO = "update_auto_check"
+        private const val KEY_UPDATE_SKIPPED = "update_skipped_code"
+        private const val KEY_UPDATE_LAST_CHECK = "update_last_check"
         private const val KEY_HANDS_FREE = "hands_free"
         private const val KEY_WAKE = "wake_word"
 

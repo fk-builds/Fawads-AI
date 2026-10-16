@@ -25,3 +25,11 @@ release/
 
 # Keystore signing files (NEVER commit these)
 *.jks
+
+# Phone build outputs + local release metadata
+dist/
+*.aab
+*.log
+# Local signing config created by scripts/make-keystore.sh
+keystore.properties
+fawads-release.keystore

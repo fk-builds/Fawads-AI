@@ -18,6 +18,12 @@
     <!-- Services / Overlay -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Android 14+: a foreground service that touches the mic must declare the
+         microphone type or startForeground() throws SecurityException. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Play-Store-style in-app updater: lets us open the system installer for a
+         downloaded APK. Granted per-install, revocable in Settings. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -36,23 +42,55 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
+    <!-- Every phone shape gets the app: small phones, phablets, tablets,
+         foldables. neverForLayouts=false keeps it resizable/letterbox-free. -->
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:resizeable="true"
+        android:anyDensity="true" />
+
+    <!-- Only arm64/x86 phones in daily use matter; nothing here is ABI-specific. -->
+    <uses-feature android:name="android.hardware.microphone" android:required="true" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.faketouch" android:required="false" />
+
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:name=".util.FawadsApp"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:resizeableActivity="true"
         android:supportsRtl="true"
+        android:testOnly="false"
         android:theme="@style/Theme.FawadsAI"
-        android:usesCleartextTraffic="true"
         tools:targetApi="34">
+
+        <!-- Lets the in-app updater hand a downloaded APK to the system installer
+             on every device/ROM (FileProvider is the only sanctioned way >= N). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode|fontScale|locale"
             android:theme="@style/Theme.FawadsAI">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -64,30 +102,34 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode|fontScale|locale"
             android:theme="@style/Theme.FawadsAI" />
 
         <activity
             android:name=".ui.security.SecurityActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode|fontScale|locale"
             android:theme="@style/Theme.FawadsAI" />
 
         <activity
             android:name=".ui.security.LockActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode|fontScale|locale"
             android:theme="@style/Theme.FawadsAI" />
 
         <activity
             android:name=".ui.notes.NotesActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode|fontScale|locale"
             android:theme="@style/Theme.FawadsAI" />
 
         <service
             android:name=".service.FawadsOverlayService"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="microphone|dataSync" />
 
         <service
             android:name=".service.CallMonitorService"

@@ -35,6 +35,7 @@ import com.fawads.ai.service.CallMonitorService
 import com.fawads.ai.service.FawadsOverlayService
 import com.fawads.ai.ui.security.LockActivity
 import com.fawads.ai.util.Prefs
+import com.fawads.ai.util.checkForUpdates
 import com.fawads.ai.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -110,6 +111,10 @@ class MainActivity : AppCompatActivity() {
         // app on first launch.
         checkPermissions()
         handleIncomingCall(intent)
+
+        // Play-Store-style self update: silent, throttled (12h), and skipped
+        // entirely while we're handling an incoming call.
+        if (!isCall) checkForUpdates(manual = false)
     }
 
     private fun proceedAfterPermissions() {

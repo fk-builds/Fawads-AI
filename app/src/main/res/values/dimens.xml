@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Size tokens so the UI fits every screen instead of one reference device.
+  These base values are the *small-phone* defaults (480x800 / 320dp-wide
+  devices, big system font scale). Larger screens override them in
+  values-sw360dp / values-sw600dp.
+-->
+<resources>
+    <dimen name="orb_size">210dp</dimen>
+    <dimen name="waveform_width">180dp</dimen>
+    <dimen name="waveform_height">34dp</dimen>
+    <dimen name="waveform_overlap">-26dp</dimen>
+    <dimen name="chat_height">140dp</dimen>
+    <dimen name="mic_button_size">66dp</dimen>
+    <dimen name="mic_button_padding">16dp</dimen>
+    <dimen name="topbar_padding_top">34dp</dimen>
+    <dimen name="topbar_padding_side">14dp</dimen>
+    <dimen name="bottom_padding">14dp</dimen>
+    <dimen name="screen_padding">14dp</dimen>
+    <dimen name="title_size">18sp</dimen>
+    <dimen name="status_size">12sp</dimen>
+    <dimen name="card_inset_bottom">14dp</dimen>
+</resources>

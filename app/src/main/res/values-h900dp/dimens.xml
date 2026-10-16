@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tall modern phones (19.5:9 and up, e.g. 411x914dp): plenty of vertical
+     room, so the orb and chat log get the generous sizes. -->
+<resources>
+    <dimen name="orb_size">268dp</dimen>
+    <dimen name="waveform_width">210dp</dimen>
+    <dimen name="waveform_height">42dp</dimen>
+    <dimen name="waveform_overlap">-34dp</dimen>
+    <dimen name="chat_height">210dp</dimen>
+    <dimen name="mic_button_size">76dp</dimen>
+    <dimen name="mic_button_padding">19dp</dimen>
+    <dimen name="topbar_padding_top">40dp</dimen>
+    <dimen name="topbar_padding_side">18dp</dimen>
+    <dimen name="bottom_padding">24dp</dimen>
+    <dimen name="screen_padding">18dp</dimen>
+    <dimen name="title_size">21sp</dimen>
+    <dimen name="status_size">13sp</dimen>
+    <dimen name="card_inset_bottom">16dp</dimen>
+</resources>

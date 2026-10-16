@@ -1,21 +1,79 @@
+import java.util.Properties
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  Release signing — read from the git-ignored `keystore.properties`.
+//  Created on the phone with:  bash scripts/make-keystore.sh
+//  If the key file is missing we fall back to the debug key so a build never
+//  hard-fails (a debug-signed APK still installs on any device; it just can't
+//  go to Play and can't be produced later with a different key without
+//  uninstalling).
+// ─────────────────────────────────────────────────────────────────────────────
+def keystoreProps = new Properties()
+def keystorePropsFile = rootProject.file('keystore.properties')
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def releaseStoreFileName = keystoreProps.getProperty('storeFile') ?: ''
+def hasReleaseKey = !releaseStoreFileName.isEmpty() &&
+        new File(rootProject.projectDir, releaseStoreFileName).exists()
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Version — single source of truth: version.properties (override with
+//  -PVERSION_CODE=12 -PVERSION_NAME=1.2.0 for a one-off build).
+// ─────────────────────────────────────────────────────────────────────────────
+def versionProps = new Properties()
+def versionPropsFile = rootProject.file('version.properties')
+if (versionPropsFile.exists()) {
+    versionPropsFile.withInputStream { versionProps.load(it) }
+}
+def versionValue = { String key, String fallback ->
+    project.hasProperty(key) ? project.property(key).toString()
+            : (versionProps.getProperty(key) ?: fallback)
+}
+def appVersionCode = versionValue('VERSION_CODE', '1').trim().toInteger()
+def appVersionName = versionValue('VERSION_NAME', '1.0.0').trim()
+
+// Default update feed (empty = updater disabled). Users can override it in
+// Settings → Updates, so this never has to change for a device-specific host.
+def updateFeedUrl = project.hasProperty('UPDATE_FEED_URL') ? project.property('UPDATE_FEED_URL') : ''
+
 android {
     namespace 'com.fawads.ai'
     compileSdk 34
 
+    // The arm64 (Termux-on-phone) build we support ships exactly this one
+    // build-tools version, so pin it: phone and PC then build identically.
+    buildToolsVersion '34.0.4'
+
     defaultConfig {
         applicationId "com.fawads.ai"
+        // Android 8.0+ — covers essentially every phone in daily use today.
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
+        versionCode appVersionCode
+        versionName appVersionName
 
         vectorDrawables {
             useSupportLibrary true
+        }
+
+        buildConfigField 'String', 'UPDATE_FEED_URL', "\"${updateFeedUrl}\""
+        buildConfigField 'int', 'BUILD_VERSION_CODE', "${appVersionCode}"
+    }
+
+    signingConfigs {
+        if (hasReleaseKey) {
+            release {
+                storeFile new File(rootProject.projectDir, releaseStoreFileName)
+                storePassword keystoreProps.getProperty('storePassword')
+                keyAlias keystoreProps.getProperty('keyAlias')
+                keyPassword keystoreProps.getProperty('keyPassword')
+            }
         }
     }
 
@@ -24,11 +82,12 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseKey ? signingConfigs.release : signingConfigs.debug
         }
         debug {
             applicationIdSuffix ".debug"
             debuggable true
+            signingConfig signingConfigs.debug
         }
     }
 
@@ -43,13 +102,50 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
+    }
+
+    // Never let a lint finding stop a build that runs from a phone terminal.
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
     }
 
     packagingOptions {
         resources {
-            excludes += ['/META-INF/{AL2.0,LGPL2.1}']
+            excludes.add('/META-INF/{AL2.0,LGPL2.1}')
+            excludes.add('META-INF/DEPENDENCIES')
+            excludes.add('META-INF/*.version')
+            excludes.add('kotlin/**')
+            excludes.add('DebugProbesKt.bin')
+        }
+        jniLibs {
+            // Keep the .so files as shipped by the AARs. AGP would otherwise
+            // call llvm-strip from an NDK — and no NDK can run on arm64 Android.
+            keepDebugSymbols.add('**/*.so')
+            useLegacyPackaging = false
         }
     }
+
+    // One universal APK / AAB: no per-density or per-ABI splits, so the single
+    // file we hand out works on every phone (that's also what sideloading needs).
+    bundle {
+        language { enableSplit = false }
+        density { enableSplit = false }
+        abi { enableSplit = false }
+    }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+}
+
+if (!hasReleaseKey) {
+    logger.warn("\n[ Fawad's AI ] keystore.properties not found -> release APK is signed with the DEBUG key." +
+            "\n[ Fawad's AI ] Fine for testing/sideloading. For real updates + Play Store run:  bash scripts/make-keystore.sh\n")
+} else {
+    logger.warn("\n[ Fawad's AI ] release build signed with: ${releaseStoreFileName} (alias ${keystoreProps.getProperty('keyAlias')})\n")
 }
 
 dependencies {

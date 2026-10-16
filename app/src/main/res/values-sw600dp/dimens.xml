@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tablets, foldables (unfolded) and big phablets: 600dp+ smallest width. -->
+<resources>
+    <dimen name="orb_size">320dp</dimen>
+    <dimen name="waveform_width">280dp</dimen>
+    <dimen name="waveform_height">48dp</dimen>
+    <dimen name="waveform_overlap">-38dp</dimen>
+    <dimen name="chat_height">300dp</dimen>
+    <dimen name="mic_button_size">88dp</dimen>
+    <dimen name="mic_button_padding">22dp</dimen>
+    <dimen name="topbar_padding_top">28dp</dimen>
+    <dimen name="topbar_padding_side">28dp</dimen>
+    <dimen name="bottom_padding">28dp</dimen>
+    <dimen name="screen_padding">28dp</dimen>
+    <dimen name="title_size">26sp</dimen>
+    <dimen name="status_size">15sp</dimen>
+    <dimen name="card_inset_bottom">20dp</dimen>
+</resources>
