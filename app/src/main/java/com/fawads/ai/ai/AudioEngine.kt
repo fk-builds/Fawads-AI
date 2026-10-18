@@ -8,7 +8,7 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.util.Base64
 import android.util.Log
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlin.math.sqrt
 
@@ -46,7 +46,7 @@ class AudioEngine {
     @Volatile private var muted = false
     @Volatile private var runPlayback = true
 
-    private val playbackQueue = ConcurrentLinkedQueue<ByteArray>()
+    private val playbackQueue = LinkedBlockingQueue<ByteArray>()
 
     // -------------------------------- MIC --------------------------------
     fun startRecording() {

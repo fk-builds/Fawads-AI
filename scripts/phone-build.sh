@@ -29,9 +29,9 @@ PLAY=0
 COPIES=()
 
 C_G="\033[32m"; C_R="\033[31m"; C_Y="\033[33m"; C_D="\033[2m"; C_0="\033[0m"
-info() { printf '%s==>%s %s\n' "$C_G" "$C_0" "$*"; }
-warn() { printf '%swarn%s %s\n' "$C_Y" "$C_0" "$*"; }
-die()  { printf '%sFAIL%s %s\n' "$C_R" "$C_0" "$*" >&2; exit 1; }
+info() { printf '%b==>%b %s\n' "$C_G" "$C_0" "$*"; }
+warn() { printf '%bwarn%b %s\n' "$C_Y" "$C_0" "$*"; }
+die()  { printf '%bFAIL%b %s\n' "$C_R" "$C_0" "$*" >&2; exit 1; }
 
 for arg in "$@"; do
   case "$arg" in
@@ -51,6 +51,10 @@ cd "$REPO" || die "repo dir nahi mila: $REPO"
 # ───────────────────────── env ─────────────────────────
 [ -n "${PREFIX:-}" ] || warn "Termux ke bahar chal raha hai — phone par Termux ke andar hi chalayein."
 
+if [ ! -d "$SDK_DIR/platforms/android-34" ] || [ ! -x "$SDK_DIR/build-tools/$BUILD_TOOLS_VERSION/aapt2" ]; then
+  info "Android SDK missing hai — setup chala raha hoon."
+  bash "$REPO/scripts/phone-setup.sh" || die "SDK setup fail hua"
+fi
 if ! command -v java >/dev/null 2>&1; then
   die "Java nahi mila. Pehle: bash scripts/phone-setup.sh"
 fi
@@ -65,7 +69,7 @@ fi
 export ANDROID_HOME="$SDK_DIR"
 export ANDROID_SDK_ROOT="$SDK_DIR"
 export PATH="$PATH:$SDK_DIR/platform-tools:$SDK_DIR/build-tools/$BUILD_TOOLS_VERSION"
-export GRADLE_OPTS="${GRADLE_OPTS:-} -Dorg.gradle.jvmargs=-Xmx${HEAP_MB}m"
+export GRADLE_OPTS="${GRADLE_OPTS:-} -Dkotlin.compiler.execution.strategy=in-process"
 
 TOTAL_MEM_MB=$(grep MemTotal /proc/meminfo 2>/dev/null | awk '{printf "%d", $2/1024}')
 if [ -n "${TOTAL_MEM_MB:-}" ] && [ "$TOTAL_MEM_MB" -lt 4000 ] && [ "$HEAP_MB" -gt 1536 ]; then
@@ -115,7 +119,7 @@ if [ "$TASKS" = "doctor" ]; then
   echo "  keystore:  $([ -f "$REPO/keystore.properties" ] && echo present || echo 'MISSING (release = debug-signed)')"
   echo "  version:   $VN (code $VC)"
   echo "  ~/.gradle/gradle.properties aapt2 override: $(grep -c 'aapt2FromMavenOverride' "$HOME/.gradle/gradle.properties" 2>/dev/null || echo 0) line(s)"
-  echo "  free space in \$HOME: $(df -Pm "$HOME" | awk 'NR==2{print $4}')MB"
+  echo "  free space in \$HOME: $(df -Pk "$HOME" | awk 'NR==2{print $4}')MB"
   echo
   info "Sab theek lag raha hai. Build: bash scripts/phone-build.sh"
   exit 0
@@ -127,9 +131,10 @@ LOG="$DIST/build.log"
 info "Building $TASKS (v$VN / code $VC) — phone par pehli baar me 15-40 min lag sakte hain (dependency downloads)"
 
 set -x
-./gradlew --no-daemon --max-workers="${MAX_WORKERS:-2}" \
+./gradlew --no-daemon --max-workers="${MAX_WORKERS:-1}" \
   -Dorg.gradle.jvmargs="-Xmx${HEAP_MB}m -XX:MaxMetaspaceSize=512m" \
-  -PVERSION_CODE="$VC" -PVERSION_NAME="$VN" \
+  -Dkotlin.compiler.execution.strategy=in-process \
+  -PVERSION_CODE="$VC" -PVERSION_NAME="$VN" -PUPDATE_FEED_URL="${UPDATE_FEED_URL:-}" \
   $TASKS --stacktrace 2>&1 | tee "$LOG"
 STATUS=${PIPESTATUS[0]}
 set +x

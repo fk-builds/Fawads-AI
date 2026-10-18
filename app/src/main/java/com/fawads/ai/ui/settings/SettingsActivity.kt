@@ -168,7 +168,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun save() {
         prefs.apiKey = binding.apiKeyInput.text?.toString()?.trim().orEmpty()
-        prefs.userName = binding.nameInput.text?.toString()?.trim().ifEmpty { "Fawad" }
+        prefs.userName = binding.nameInput.text?.toString()?.trim()?.ifEmpty { "Fawad" } ?: "Fawad"
         prefs.geminiModel = Prefs.MODELS.getOrNull(binding.modelSpinner.selectedItemPosition) ?: Prefs.DEFAULT_MODEL
         prefs.geminiVoice = Prefs.VOICES.getOrNull(binding.voiceSpinner.selectedItemPosition) ?: Prefs.DEFAULT_VOICE
         val personality = when (binding.personalityGroup.checkedRadioButtonId) {

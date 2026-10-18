@@ -109,19 +109,19 @@ private fun AppCompatActivity.startDownload(update: UpdateManager.Update) {
 
         UpdateManager.notifyDone(appContext, getString(R.string.update_ready))
 
-        if (!UpdateManager.canInstallApks(this)) {
-            AlertDialog.Builder(this)
+        if (!UpdateManager.canInstallApks(this@startDownload)) {
+            AlertDialog.Builder(this@startDownload)
                 .setTitle(R.string.update_permission_title)
                 .setMessage(R.string.update_permission_message)
                 .setPositiveButton(R.string.update_open_settings) { _, _ ->
-                    UpdateManager.openInstallPermission(this)
+                    UpdateManager.openInstallPermission(this@startDownload)
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
             return@launch
         }
 
-        val started = runCatching { UpdateManager.install(this, apk) }.getOrNull() ?: false
+        val started = runCatching { UpdateManager.install(this@startDownload, apk) }.getOrNull() ?: false
         if (!started) toast(getString(R.string.update_install_failed))
     }
 }

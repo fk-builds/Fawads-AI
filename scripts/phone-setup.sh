@@ -37,9 +37,9 @@ ARCHIVES=(
 )
 
 C_G="\033[32m"; C_R="\033[31m"; C_Y="\033[33m"; C_D="\033[2m"; C_0="\033[0m"
-info() { printf '%s==>%s %s\n' "$C_G" "$C_0" "$*"; }
-warn() { printf '%swarn%s %s\n' "$C_Y" "$C_0" "$*"; }
-die()  { printf '%sFAIL%s %s\n' "$C_R" "$C_0" "$*" >&2; exit 1; }
+info() { printf '%b==>%b %s\n' "$C_G" "$C_0" "$*"; }
+warn() { printf '%bwarn%b %s\n' "$C_Y" "$C_0" "$*"; }
+die()  { printf '%bFAIL%b %s\n' "$C_R" "$C_0" "$*" >&2; exit 1; }
 
 CHECK_ONLY=0
 SKIP_UPDATE=0
@@ -70,7 +70,7 @@ if [ -n "${RAM_KB:-}" ] && [ "$RAM_KB" -lt 3000000 ]; then
   warn "RAM kam hai ($((RAM_KB/1024)) MB). Build ke waqt 'Logcat/Termux' ke alawa sab band karein; low-memory flag use karein."
 fi
 
-FREE_MB=$(df -Pm "$HOME" | awk 'NR==2{print $4}')
+FREE_MB=$(df -Pk "$HOME" | awk 'NR==2{print $4}')
 if [ -n "${FREE_MB:-}" ] && [ "$FREE_MB" -lt 3000 ]; then
   warn "Jagah kam hai: ${FREE_MB}MB free in \$HOME. Setup ke liye ~3GB chahiye (SDK + Gradle cache + build)."
 fi
@@ -242,9 +242,10 @@ if [ "$CHECK_ONLY" -eq 1 ]; then
 fi
 
 mkdir -p "$CACHE_DIR"
+install_packages
+for entry in "${ARCHIVES[@]}"; do IFS='|' read -r name url sha marker <<<"$entry"; fetch "$name" "$url" "$sha"; done
 [ -d "$HOME/storage/shared" ] || warn "~/storage/shared nahi hai — 'termux-setup-storage' chalayein taake APK /sdcard/Download tak pohnche"
 
-install_packages
 extract_all
 install_platform
 write_gradle_props

@@ -3,7 +3,6 @@ package com.fawads.ai.ai
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -57,7 +56,7 @@ object FaceMatcher {
             FaceLandmark.LEFT_EYE, FaceLandmark.RIGHT_EYE,
             FaceLandmark.LEFT_CHEEK, FaceLandmark.RIGHT_CHEEK,
             FaceLandmark.NOSE_BASE, FaceLandmark.MOUTH_LEFT, FaceLandmark.MOUTH_RIGHT,
-            FaceLandmark.MOUTH_BOTTOM, FaceLandmark.EAR_LEFT, FaceLandmark.EAR_RIGHT
+            FaceLandmark.MOUTH_BOTTOM, FaceLandmark.LEFT_EAR, FaceLandmark.RIGHT_EAR
         )
         val pts = ids.mapNotNull { lm(it) }
         if (pts.size < 6) return null
@@ -76,8 +75,8 @@ object FaceMatcher {
         val n = frames.firstOrNull { it.size > 0 }?.size ?: return null
         if (frames.any { it.size != n }) return null
         val out = FloatArray(n)
-        for (f in frames) for (i in 0 until n) out[i] += f[i]
-        for (i in 0 until n) out[i] /= frames.size
+        for (f in frames) for (i in 0 until n) out[i] = out[i] + f[i]
+        for (i in 0 until n) out[i] = out[i] / frames.size
         return out
     }
 
