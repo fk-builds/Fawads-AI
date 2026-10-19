@@ -70,11 +70,11 @@ class OrbAnimationView @JvmOverloads constructor(
         val angle = progress * 360f
 
         val (c1, c2) = when (state) {
-            State.LISTENING -> 0xFFFF1744.toInt() to 0xFFD500F9.toInt()
-            State.SPEAKING -> 0xFFE040FB.toInt() to 0xFFFF1744.toInt()
-            State.THINKING -> 0xFF40C4FF.toInt() to 0xFF00B0FF.toInt()
-            State.ACTIVE -> 0xFFFF1744.toInt() to 0xFFD500F9.toInt()
-            else -> 0xFFB71C1C.toInt() to 0xFF880E4F.toInt()
+            State.LISTENING -> 0xFFB08840.toInt() to 0xFFCDA967.toInt()
+            State.SPEAKING -> 0xFFCDA967.toInt() to 0xFFB08840.toInt()
+            State.THINKING -> 0xFF9A7738.toInt() to 0xFFD6B87E.toInt()
+            State.ACTIVE -> 0xFFB08840.toInt() to 0xFFCDA967.toInt()
+            else -> 0xFF8F6F33.toInt() to 0xFF5C471F.toInt()
         }
 
         // ---------- 1. Radial glow ----------
@@ -119,7 +119,7 @@ class OrbAnimationView @JvmOverloads constructor(
         // ---------- 5. Thinking arc ----------
         if (state == State.THINKING) {
             arcPaint.strokeWidth = 4f
-            arcPaint.color = 0xEE40C4FF.toInt()
+            arcPaint.color = 0xEECDA967.toInt()
             canvas.drawArc(cx - r, cy - r, cx + r, cy + r, angle, 110f, false, arcPaint)
             canvas.drawArc(cx - r, cy - r, cx + r, cy + r, angle + 180f, 55f, false, arcPaint)
         }

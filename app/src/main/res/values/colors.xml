@@ -23,5 +23,5 @@
     <color name="orb_speak_2">#B08840</color>
     <color name="orb_thinking_1">#9A7738</color>
     <color name="orb_thinking_2">#D6B87E</color>
-    <color name="ic_launcher_background">#241F18</color>
+    <color name="ic_launcher_background">#000000</color>
 </resources>
