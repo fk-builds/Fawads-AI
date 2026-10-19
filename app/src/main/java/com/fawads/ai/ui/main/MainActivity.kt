@@ -66,6 +66,9 @@ class MainActivity : AppCompatActivity() {
     private val outputBuffer = StringBuilder()
 
     private var muted = false
+    private var assistantStarted = false
+    private var permissionRequestInProgress = false
+    private var pendingIncomingCall: String? = null
     private var inCallMode = false
     private var callSpeechRecognizer: SpeechRecognizer? = null
     private var handsFreeRecognizer: SpeechRecognizer? = null
@@ -105,21 +108,40 @@ class MainActivity : AppCompatActivity() {
             IntentFilter(CallMonitorService.ACTION_CALL_ENDED),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-        // Only start the mic / services / Gemini connection once the
-        // permission dialog flow has actually finished — starting them
-        // immediately raced the async permission request and crashed the
-        // app on first launch.
-        checkPermissions()
+        // Keep first launch lightweight; voice permissions and audio start
+        // only after the user explicitly chooses the assistant.
         handleIncomingCall(intent)
 
-        // Play-Store-style self update: silent, throttled (12h), and skipped
-        // entirely while we're handling an incoming call.
-        if (!isCall) checkForUpdates(manual = false)
+        // Keep network work off the first-render path.
+        if (!isCall) handler.postDelayed({
+            if (!isFinishing) runCatching { checkForUpdates(manual = false) }
+        }, 5_000)
     }
 
     private fun proceedAfterPermissions() {
-        startSystemServices()
-        handler.postDelayed({ initGeminiLive() }, 300)
+        permissionRequestInProgress = false
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            assistantStarted = false
+            status("Microphone permission is needed for voice")
+            toast("Allow microphone access to start voice assistant")
+            showHomeScreen()
+            return
+        }
+        assistantStarted = true
+        runCatching { startSystemServices() }
+        handler.postDelayed({
+            try {
+                initGeminiLive()
+            } catch (e: Exception) {
+                geminiLive?.disconnect()
+                audioEngine?.release()
+                geminiLive = null
+                audioEngine = null
+                assistantStarted = false
+                status("Voice could not start")
+                addChat(ChatMessage("Voice startup failed: ${e.message ?: "Audio device unavailable"}", false))
+            }
+        }, 300)
     }
 
     // ---------------------------- INIT ----------------------------
@@ -133,16 +155,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, com.fawads.ai.ui.settings.SettingsActivity::class.java))
         }
 
-        binding.micButton.setOnClickListener { toggleMute() }
-        binding.startTalkingButton.setOnClickListener {
-            showAssistantScreen()
-            if (muted) toggleMute()
-            binding.micButton.requestFocus()
+        binding.micButton.setOnClickListener {
+            if (assistantStarted) toggleMute() else startAssistant()
         }
+        binding.startTalkingButton.setOnClickListener { startAssistant() }
         binding.talkActionButton.setOnClickListener { binding.startTalkingButton.performClick() }
         binding.voiceActionButton.setOnClickListener { binding.startTalkingButton.performClick() }
         binding.homeNav.setOnClickListener { showHomeScreen() }
-        binding.chatNav.setOnClickListener { showAssistantScreen() }
+        binding.chatNav.setOnClickListener { startAssistant() }
         binding.backHomeButton.setOnClickListener { showHomeScreen() }
         binding.settingsNav.setOnClickListener {
             startActivity(Intent(this, com.fawads.ai.ui.settings.SettingsActivity::class.java))
@@ -176,6 +196,15 @@ class MainActivity : AppCompatActivity() {
         binding.mainScroll.smoothScrollTo(0, 0)
     }
 
+    private fun startAssistant() {
+        showAssistantScreen()
+        if (assistantStarted) {
+            if (muted) toggleMute()
+            return
+        }
+        checkPermissions()
+    }
+
     private fun showHomeScreen() {
         binding.assistantContent.visibility = View.GONE
         binding.homeContent.visibility = View.VISIBLE
@@ -183,19 +212,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startSystemServices() {
-        // Floating orb (needs SYSTEM_ALERT_WINDOW)
+        // Start optional services only when their special permissions are
+        // already enabled; never leave the app during first use.
         if (Settings.canDrawOverlays(this)) {
             try { startService(Intent(this, FawadsOverlayService::class.java)) } catch (_: Exception) {}
-        } else {
-            toast("Overlay permission needed for the floating orb")
-            startActivity(
-                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-            )
         }
         // Call monitor
-        try {
-            ContextCompat.startForegroundService(this, Intent(this, CallMonitorService::class.java))
-        } catch (_: Exception) {}
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            try { ContextCompat.startForegroundService(this, Intent(this, CallMonitorService::class.java)) } catch (_: Exception) {}
+        }
     }
 
     private fun startStatusUpdates() {
@@ -227,6 +252,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
+        if (assistantStarted || permissionRequestInProgress) return
         val perms = mutableListOf(
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_CONTACTS,
@@ -243,6 +269,7 @@ class MainActivity : AppCompatActivity() {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
         if (toRequest.isNotEmpty()) {
+            permissionRequestInProgress = true
             ActivityCompat.requestPermissions(this, toRequest.toTypedArray(), REQ_PERMS)
         } else {
             proceedAfterPermissions()
@@ -257,7 +284,13 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     setActive(true)
                     status("Connected ✓")
-                    sendGreeting()
+                    val caller = pendingIncomingCall
+                    if (caller != null) {
+                        pendingIncomingCall = null
+                        announceCall(caller)
+                    } else {
+                        sendGreeting()
+                    }
                 }
             }
             override fun onDisconnected() {
@@ -442,9 +475,14 @@ class MainActivity : AppCompatActivity() {
     // ---------------------------- INCOMING CALL ----------------------------
     private fun handleIncomingCall(intent: Intent?) {
         if (intent != null && intent.getBooleanExtra(EXTRA_INCOMING_CALL, false)) {
-            inCallMode = true
             val caller = intent.getStringExtra(EXTRA_CALLER_NAME) ?: "Unknown"
-            announceCall(caller)
+            inCallMode = true
+            if (assistantStarted) {
+                announceCall(caller)
+            } else {
+                pendingIncomingCall = caller
+                startAssistant()
+            }
         }
     }
 
@@ -534,10 +572,16 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQ_PERMS) {
+            permissionRequestInProgress = false
             if (grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
                 toast("Some permissions were denied — features may be limited")
             }
-            proceedAfterPermissions()
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                proceedAfterPermissions()
+            } else {
+                status("Microphone permission is needed for voice")
+                showHomeScreen()
+            }
         }
     }
 }
