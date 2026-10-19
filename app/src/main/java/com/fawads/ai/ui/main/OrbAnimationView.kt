@@ -70,11 +70,11 @@ class OrbAnimationView @JvmOverloads constructor(
         val angle = progress * 360f
 
         val (c1, c2) = when (state) {
-            State.LISTENING -> 0xFFB08840.toInt() to 0xFFCDA967.toInt()
-            State.SPEAKING -> 0xFFCDA967.toInt() to 0xFFB08840.toInt()
-            State.THINKING -> 0xFF9A7738.toInt() to 0xFFD6B87E.toInt()
-            State.ACTIVE -> 0xFFB08840.toInt() to 0xFFCDA967.toInt()
-            else -> 0xFF8F6F33.toInt() to 0xFF5C471F.toInt()
+            State.LISTENING -> 0xFF0866FF.toInt() to 0xFF7AA7FF.toInt()
+            State.SPEAKING -> 0xFF7AA7FF.toInt() to 0xFF0866FF.toInt()
+            State.THINKING -> 0xFF0050CD.toInt() to 0xFFB3C5FF.toInt()
+            State.ACTIVE -> 0xFF0866FF.toInt() to 0xFF7AA7FF.toInt()
+            else -> 0xFF0050CD.toInt() to 0xFF003FA5.toInt()
         }
 
         // ---------- 1. Radial glow ----------

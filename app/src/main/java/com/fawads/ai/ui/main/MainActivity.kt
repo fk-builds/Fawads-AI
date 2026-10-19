@@ -125,6 +125,7 @@ class MainActivity : AppCompatActivity() {
     // ---------------------------- INIT ----------------------------
     private fun initViews() {
         chatAdapter = ChatAdapter(chatMessages)
+        findViewById<android.widget.TextView>(com.fawads.ai.R.id.greetingText)?.text = "Good day, ${prefs.userName}"
         binding.chatRecycler.layoutManager = LinearLayoutManager(this).apply { stackFromEnd = true }
         binding.chatRecycler.adapter = chatAdapter
 
@@ -133,6 +134,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.micButton.setOnClickListener { toggleMute() }
+        binding.startTalkingButton.setOnClickListener {
+            showAssistantScreen()
+            if (muted) toggleMute()
+            binding.micButton.requestFocus()
+        }
+        binding.talkActionButton.setOnClickListener { binding.startTalkingButton.performClick() }
+        binding.voiceActionButton.setOnClickListener { binding.startTalkingButton.performClick() }
+        binding.homeNav.setOnClickListener { showHomeScreen() }
+        binding.chatNav.setOnClickListener { showAssistantScreen() }
+        binding.backHomeButton.setOnClickListener { showHomeScreen() }
+        binding.settingsNav.setOnClickListener {
+            startActivity(Intent(this, com.fawads.ai.ui.settings.SettingsActivity::class.java))
+        }
         binding.micButton.setOnLongClickListener {
             audioEngine?.interruptPlayback()
             geminiLive?.interrupt()
@@ -154,6 +168,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         applyMuteUi()
+    }
+
+    private fun showAssistantScreen() {
+        binding.homeContent.visibility = View.GONE
+        binding.assistantContent.visibility = View.VISIBLE
+        binding.mainScroll.smoothScrollTo(0, 0)
+    }
+
+    private fun showHomeScreen() {
+        binding.assistantContent.visibility = View.GONE
+        binding.homeContent.visibility = View.VISIBLE
+        binding.mainScroll.smoothScrollTo(0, 0)
     }
 
     private fun startSystemServices() {
