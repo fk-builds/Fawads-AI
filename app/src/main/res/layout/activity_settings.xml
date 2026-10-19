@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark"
+    android:background="#EFEAE0"
     android:fillViewport="true">
 
     <LinearLayout
@@ -32,7 +32,7 @@
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-black"
                 android:text="Settings"
-                android:textColor="@color/text_primary"
+                android:textColor="#26221B"
                 android:textSize="22sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -43,7 +43,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="18dp"
             android:text="Configure Fawad's AI"
-            android:textColor="@color/text_hint"
+            android:textColor="#8F887A"
             android:textSize="13sp" />
 
         <!-- API / Identity -->
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="AI Engine"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="Gemini API Key"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <EditText
@@ -88,8 +88,8 @@
                     android:hint="Paste your key"
                     android:inputType="textPassword"
                     android:padding="14dp"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_hint"
+                    android:textColor="#26221B"
+                    android:textColorHint="#8F887A"
                     android:textSize="13sp" />
 
                 <TextView
@@ -98,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Your Name"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <EditText
@@ -110,8 +110,8 @@
                     android:hint="Fawad"
                     android:inputType="textPersonName"
                     android:padding="14dp"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_hint"
+                    android:textColor="#26221B"
+                    android:textColorHint="#8F887A"
                     android:textSize="13sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -121,7 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Voice &amp; Model"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -145,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="AI Model"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <Spinner
@@ -162,7 +162,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Voice"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <Spinner
@@ -180,7 +180,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -195,7 +195,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Personality"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <RadioGroup
@@ -209,27 +209,27 @@
                         android:id="@+id/radioGf"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:buttonTint="@color/accent_red"
+                        android:buttonTint="#B08840"
                         android:text="GF Mode (Hinglish, caring)"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#26221B"
                         android:textSize="14sp" />
 
                     <RadioButton
                         android:id="@+id/radioProfessional"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:buttonTint="@color/accent_purple"
+                        android:buttonTint="#7E6228"
                         android:text="Professional Mode"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#26221B"
                         android:textSize="14sp" />
 
                     <RadioButton
                         android:id="@+id/radioAssistant"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:buttonTint="@color/accent_purple"
+                        android:buttonTint="#7E6228"
                         android:text="Assistant Mode"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#26221B"
                         android:textSize="14sp" />
                 </RadioGroup>
             </LinearLayout>
@@ -240,7 +240,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -255,7 +255,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Prime Contacts"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -263,7 +263,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Say 'call my close friend' to reach the 1st contact."
-                    android:textColor="@color/text_hint"
+                    android:textColor="#8F887A"
                     android:textSize="11sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -291,7 +291,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -306,7 +306,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Security"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -314,7 +314,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Lock with PIN + Face. Whoever sets it owns the lock."
-                    android:textColor="@color/text_hint"
+                    android:textColor="#8F887A"
                     android:textSize="11sp" />
 
                 <Button
@@ -334,7 +334,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -349,7 +349,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Voice — Hands-free"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -357,7 +357,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Say the wake word to talk without tapping."
-                    android:textColor="@color/text_hint"
+                    android:textColor="#8F887A"
                     android:textSize="11sp" />
 
                 <LinearLayout
@@ -372,7 +372,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Hands-free mode"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#26221B"
                         android:textSize="13sp" />
 
                     <androidx.appcompat.widget.SwitchCompat
@@ -386,7 +386,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="Wake word"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <EditText
@@ -398,8 +398,8 @@
                     android:hint="e.g. Fawad"
                     android:inputType="text"
                     android:padding="14dp"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_hint"
+                    android:textColor="#26221B"
+                    android:textColorHint="#8F887A"
                     android:textSize="13sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -409,7 +409,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -424,7 +424,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="Accessibility"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -434,7 +434,7 @@
                     android:layout_marginTop="12dp"
                     android:padding="14dp"
                     android:text="Tap to check/enable"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="13sp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -444,7 +444,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_bg"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
 
@@ -459,7 +459,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:text="@string/updates_title"
-                    android:textColor="@color/accent_red"
+                    android:textColor="#B08840"
                     android:textSize="15sp" />
 
                 <TextView
@@ -467,7 +467,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="@string/updates_subtitle"
-                    android:textColor="@color/text_hint"
+                    android:textColor="#8F887A"
                     android:textSize="11sp" />
 
                 <TextView
@@ -477,7 +477,7 @@
                     android:layout_marginTop="10dp"
                     android:fontFamily="monospace"
                     android:text="@string/updates_current"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <TextView
@@ -485,7 +485,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="@string/updates_feed_label"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#57503F"
                     android:textSize="12sp" />
 
                 <EditText
@@ -498,8 +498,8 @@
                     android:importantForAutofill="no"
                     android:inputType="textUri"
                     android:padding="14dp"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_hint"
+                    android:textColor="#26221B"
+                    android:textColorHint="#8F887A"
                     android:textSize="13sp" />
 
                 <LinearLayout
@@ -514,7 +514,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/updates_auto"
-                        android:textColor="@color/text_primary"
+                        android:textColor="#26221B"
                         android:textSize="13sp" />
 
                     <androidx.appcompat.widget.SwitchCompat
@@ -528,7 +528,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/updates_enable_note"
-                    android:textColor="@color/text_hint"
+                    android:textColor="#8F887A"
                     android:textSize="11sp" />
 
                 <Button
@@ -562,7 +562,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="Restart the app to apply voice/model changes."
-            android:textColor="@color/text_hint"
+            android:textColor="#8F887A"
             android:textSize="11sp" />
     </LinearLayout>
 </ScrollView>
