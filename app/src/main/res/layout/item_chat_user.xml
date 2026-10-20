@@ -14,7 +14,6 @@
         android:layout_gravity="end"
         android:background="@drawable/bg_chat_user"
         android:maxWidth="290dp"
-        android:padding="12dp"
-        android:textColor="#26221B"
+        android:textColor="@color/chat_user_text"
         android:textSize="14sp" />
 </FrameLayout>

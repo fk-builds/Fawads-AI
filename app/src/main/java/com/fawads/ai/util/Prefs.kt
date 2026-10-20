@@ -55,6 +55,10 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean(KEY_MUTED, false)
         set(value) = prefs.edit().putBoolean(KEY_MUTED, value).apply()
 
+    var chatHistoryJson: String
+        get() = prefs.getString(KEY_CHAT_HISTORY, "[]") ?: "[]"
+        set(value) = prefs.edit().putString(KEY_CHAT_HISTORY, value).apply()
+
     var primeContactsJson: String
         get() = prefs.getString(KEY_PRIME, "") ?: ""
         set(value) = prefs.edit().putString(KEY_PRIME, value).apply()
@@ -147,6 +151,7 @@ class Prefs(context: Context) {
         private const val KEY_VOICE = "gemini_voice"
         private const val KEY_PRIME = "prime_contacts_json"
         private const val KEY_MUTED = "muted"
+        private const val KEY_CHAT_HISTORY = "chat_history"
         private const val KEY_SEC_ENABLED = "sec_enabled"
         private const val KEY_PIN_HASH = "pin_hash"
         private const val KEY_PIN_SALT = "pin_salt"

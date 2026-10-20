@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.FawadsAI" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/accent_red</item>
+        <item name="colorPrimary">@color/gold</item>
         <item name="colorPrimaryDark">@color/bg_dark</item>
-        <item name="colorAccent">@color/accent_purple</item>
-        <item name="colorSecondary">@color/accent_purple</item>
+        <item name="colorAccent">@color/gold_dark</item>
+        <item name="colorSecondary">@color/gold_light</item>
         <item name="android:windowBackground">@color/bg_dark</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
@@ -15,10 +15,12 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorControlActivated">@color/gold</item>
     </style>
     <style name="Theme.FawadsAI.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="android:background">@color/card_bg</item>
         <item name="android:windowBackground">@color/card_bg</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="colorAccent">@color/gold</item>
     </style>
 </resources>

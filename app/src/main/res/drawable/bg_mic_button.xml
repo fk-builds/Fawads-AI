@@ -1,4 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true"><shape android:shape="oval"><solid android:color="#0050CD" /></shape></item>
-    <item><shape android:shape="oval"><solid android:color="#0866FF" /><padding android:left="18dp" android:top="18dp" android:right="18dp" android:bottom="18dp" /></shape></item>
+    <item android:state_pressed="true">
+        <shape android:shape="oval"><solid android:color="#7E6228" /></shape>
+    </item>
+    <item>
+        <shape android:shape="oval"><gradient android:angle="130" android:startColor="#B08840" android:endColor="#CDA967" /><padding android:left="18dp" android:top="18dp" android:right="18dp" android:bottom="18dp" /></shape>
+    </item>
 </selector>
