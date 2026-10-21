@@ -79,7 +79,7 @@ class WaveformView @JvmOverloads constructor(
             val left = i * gap + (gap - barW) / 2f
             val top = midH - h / 2f
             val alpha = (150 + 105 * barHeights[i]).toInt().coerceIn(150, 255)
-            paint.color = Color.argb(alpha, 255, 23, 68)
+            paint.color = Color.argb(alpha, 205, 169, 103)
             canvas.drawRoundRect(left, top, left + barW, top + h, barW / 2f, barW / 2f, paint)
         }
     }

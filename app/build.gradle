@@ -63,6 +63,7 @@ android {
         }
 
         buildConfigField 'String', 'UPDATE_FEED_URL', "\"${updateFeedUrl}\""
+        buildConfigField 'boolean', 'ADS_ENABLED', 'false'
         buildConfigField 'int', 'BUILD_VERSION_CODE', "${appVersionCode}"
     }
 
@@ -98,6 +99,7 @@ android {
 
     kotlinOptions {
         jvmTarget = '17'
+        freeCompilerArgs += ['-opt-in=androidx.camera.core.ExperimentalGetImage']
     }
 
     buildFeatures {

@@ -24,6 +24,6 @@
         android:background="@drawable/bg_chat_myra"
         android:maxWidth="290dp"
         android:padding="12dp"
-        android:textColor="@color/text_primary"
+        android:textColor="#26221B"
         android:textSize="14sp" />
 </LinearLayout>

@@ -7,6 +7,8 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
@@ -44,8 +46,60 @@ class SettingsActivity : AppCompatActivity() {
         setupSecurity()
         setupHandsFree()
         setupUpdates()
+        setupSettingsSections()
+        installPressFeedback(binding.root)
+        binding.root.findViewById<View>(R.id.settingsBack).setOnClickListener { finish() }
 
         binding.saveButton.setOnClickListener { save() }
+    }
+
+    private fun setupSettingsSections() {
+        val cardIds = listOf(
+            R.id.profileSettingsCard, R.id.aiSettingsCard, R.id.personalitySettingsCard,
+            R.id.contactsSettingsCard, R.id.securitySettingsCard, R.id.voiceSettingsCard,
+            R.id.accessibilitySettingsCard, R.id.updatesSettingsCard
+        )
+        val tabs = listOf(
+            findViewById<TextView>(R.id.settingsProfileTab),
+            findViewById<TextView>(R.id.settingsAiTab),
+            findViewById<TextView>(R.id.settingsContactsTab),
+            findViewById<TextView>(R.id.settingsSecurityTab),
+            findViewById<TextView>(R.id.settingsAppTab)
+        )
+        val groups = listOf(
+            setOf(R.id.profileSettingsCard),
+            setOf(R.id.aiSettingsCard, R.id.personalitySettingsCard, R.id.voiceSettingsCard),
+            setOf(R.id.contactsSettingsCard),
+            setOf(R.id.securitySettingsCard),
+            setOf(R.id.accessibilitySettingsCard, R.id.updatesSettingsCard)
+        )
+        fun select(index: Int) {
+            cardIds.forEach { id -> findViewById<View>(id).visibility = if (id in groups[index]) View.VISIBLE else View.GONE }
+            tabs.forEachIndexed { tabIndex, tab ->
+                val selected = tabIndex == index
+                tab.setBackgroundResource(if (selected) R.drawable.bg_nav_active else R.drawable.bg_chip)
+                tab.setTextColor(ContextCompat.getColor(this, if (selected) R.color.text_primary else R.color.text_hint))
+                tab.isSelected = selected
+            }
+        }
+        tabs.forEachIndexed { index, tab -> tab.setOnClickListener { select(index) } }
+        select(0)
+    }
+
+    private fun installPressFeedback(view: View) {
+        if (view.isClickable || view is androidx.appcompat.widget.SwitchCompat || view is android.widget.Button) {
+            view.setOnTouchListener { target, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        target.animate().scaleX(0.97f).scaleY(0.97f).setDuration(80).start()
+                        target.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> target.animate().scaleX(1f).scaleY(1f).setDuration(110).start()
+                }
+                false
+            }
+        }
+        if (view is ViewGroup) for (i in 0 until view.childCount) installPressFeedback(view.getChildAt(i))
     }
 
     private fun setupUpdates() {
@@ -71,6 +125,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupHandsFree() {
         binding.handsFreeSwitch.isChecked = prefs.handsFree
+        binding.voiceHapticsSwitch.isChecked = prefs.voiceHaptics
         binding.handsFreeSwitch.setOnCheckedChangeListener { _, checked ->
             prefs.handsFree = checked
         }
@@ -168,7 +223,8 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun save() {
         prefs.apiKey = binding.apiKeyInput.text?.toString()?.trim().orEmpty()
-        prefs.userName = binding.nameInput.text?.toString()?.trim().ifEmpty { "Fawad" }
+        prefs.userName = binding.nameInput.text?.toString()?.trim()?.ifEmpty { "Fawad" } ?: "Fawad"
+        prefs.voiceHaptics = binding.voiceHapticsSwitch.isChecked
         prefs.geminiModel = Prefs.MODELS.getOrNull(binding.modelSpinner.selectedItemPosition) ?: Prefs.DEFAULT_MODEL
         prefs.geminiVoice = Prefs.VOICES.getOrNull(binding.voiceSpinner.selectedItemPosition) ?: Prefs.DEFAULT_VOICE
         val personality = when (binding.personalityGroup.checkedRadioButtonId) {
@@ -179,7 +235,10 @@ class SettingsActivity : AppCompatActivity() {
         prefs.personalityMode = personality
         val wake = binding.wakeWordInput.text?.toString()?.trim().orEmpty()
         if (wake.isNotBlank()) prefs.wakeWord = wake
-        toast("Saved ✓. Restart the app to apply voice/model changes.")
+        prefs.updateFeedUrl = binding.updateUrlInput.text?.toString()?.trim().orEmpty()
+        prefs.autoUpdateChecks = binding.autoUpdateSwitch.isChecked
+        setResult(RESULT_OK)
+        toast("Settings saved ✓")
     }
 
     override fun onResume() {

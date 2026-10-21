@@ -27,6 +27,10 @@ A production-ready **Android AI Voice Assistant** built in **Kotlin + MVVM**, po
 - **Auto-reconnect**, keep-alive & session renewal (9 min) for the WebSocket.
 - MVVM architecture, ViewBinding, encrypted SharedPreferences, Material theming.
 - **v1.1:** Screen Lock (PIN + Face), alarms/timers/reminders/notes, live weather/news/crypto, music/search, wake-word hands-free mode, luxury gold theme.
+- **Four main pages:** Home, Tasks, Voice and Smart Chat, with Settings in the header menu.
+- **Tasks:** persistent checklist with completion, deletion and optional date/time reminders; voice-set reminders and alarms appear here too.
+- **Smart Chat:** typed Gemini conversation, locally saved history, clear-chat action, and routing for commands already supported by the assistant.
+- **Design:** warm cream canvas, antique-gold actions, charcoal Voice screen, the FWD mark and Fawad's portrait.
 
 ---
 
@@ -139,20 +143,15 @@ longer build on GitHub. To use it: **Actions → Android CI → Run workflow →
 
 ## ⚙️ First-run setup on your phone
 
-1. **Launch the app** → it will ask for permissions. **Allow all.**
-
-2. **Microphone** — required for voice.
-3. **Notifications** — so the overlay / services can run.
-
-4. **Paste your Gemini API Key** in **Settings**.
-
-5. **Enable Accessibility** (for opening/closing apps):
+1. **Launch the app.** Home opens without starting microphone capture.
+2. Open **Settings** from the header menu and save your Gemini API key.
+3. Choose **Voice** when you want to speak; Android will request microphone access at that point.
+4. Use **Chat** for typed questions and supported typed commands. Chat history is saved on this device and can be cleared from Chat.
+5. To receive reminder notifications, allow notification access when you create a scheduled reminder.
+6. **Enable Accessibility** only if you want app-control commands such as closing the current app:
    - Settings → *Accessibility* → **"Fawad's AI"** → enable.
    - Without it, app-control commands will warn you.
-
-6. **Overlay permission** (`Display over other apps`) — enables the floating orb.
-
-7. **Restart the app.** It connects to Gemini Live and greets you in a human voice. 🎙️
+7. **Overlay permission** (`Display over other apps`) is optional and is only needed for the floating orb feature.
 
 ---
 

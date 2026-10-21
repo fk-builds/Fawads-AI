@@ -68,7 +68,7 @@ object CommandParser {
         // Timer
         if (hasAny(t, "timer", "countdown", "maaloom time", "kitni der")) {
             val mins = extractMin(t) ?: 1
-            return AppCommand(CommandType.TIMER, mapOf("minutes" to mins))
+            return AppCommand(CommandType.TIMER, mapOf("minutes" to mins.toString()))
         }
         // Alarm
         if (hasAny(t, "alarm", "alarm lagao", "alarm set", "par jagao", "per jagao")) {

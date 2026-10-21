@@ -2,6 +2,8 @@ package com.fawads.ai.service
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
+import android.graphics.Path
+import android.accessibilityservice.GestureDescription
 import android.os.Bundle
 import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
@@ -43,8 +45,21 @@ class AccessibilityHelperService : AccessibilityService() {
 
     fun closeCurrentApp() = performGlobalAction(GLOBAL_ACTION_HOME)
     fun goBack() = performGlobalAction(GLOBAL_ACTION_BACK)
-    fun scrollDown() = performGlobalAction(GLOBAL_ACTION_SCROLL_FORWARD)
-    fun scrollUp() = performGlobalAction(GLOBAL_ACTION_SCROLL_BACKWARD)
+    fun scrollDown(): Boolean = swipe(forward = true)
+    fun scrollUp(): Boolean = swipe(forward = false)
+
+    private fun swipe(forward: Boolean): Boolean {
+        val metrics = resources.displayMetrics
+        val x = metrics.widthPixels * 0.5f
+        val top = metrics.heightPixels * 0.30f
+        val bottom = metrics.heightPixels * 0.75f
+        val path = Path().apply {
+            moveTo(x, if (forward) bottom else top)
+            lineTo(x, if (forward) top else bottom)
+        }
+        val stroke = GestureDescription.StrokeDescription(path, 0L, 350L)
+        return dispatchGesture(GestureDescription.Builder().addStroke(stroke).build(), null, null)
+    }
 
     fun clickOnText(text: String) {
         findNode(text)?.let {

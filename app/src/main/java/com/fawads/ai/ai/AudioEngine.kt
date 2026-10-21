@@ -8,7 +8,7 @@ import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.util.Base64
 import android.util.Log
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlin.math.sqrt
 
@@ -44,9 +44,9 @@ class AudioEngine {
     @Volatile private var recording = false
     @Volatile private var speaking = false
     @Volatile private var muted = false
-    @Volatile private var runPlayback = true
+    @Volatile private var runPlayback = false
 
-    private val playbackQueue = ConcurrentLinkedQueue<ByteArray>()
+    private val playbackQueue = LinkedBlockingQueue<ByteArray>()
 
     // -------------------------------- MIC --------------------------------
     fun startRecording() {
@@ -68,12 +68,14 @@ class AudioEngine {
             audioRecord?.startRecording()
             Thread({ recordLoop() }, "FawadsMic").start()
         } catch (e: SecurityException) {
+            recording = false
             Log.e(TAG, "RECORD_AUDIO permission not granted", e)
-            audioRecord?.release()
+            try { audioRecord?.release() } catch (_: Exception) {}
             audioRecord = null
         } catch (e: Exception) {
+            recording = false
             Log.e(TAG, "startRecording failed", e)
-            audioRecord?.release()
+            try { audioRecord?.release() } catch (_: Exception) {}
             audioRecord = null
         }
     }
@@ -109,25 +111,42 @@ class AudioEngine {
     // -------------------------------- SPEAKER --------------------------------
     fun startPlayback() {
         if (audioTrack == null) {
-            val minBuf = AudioTrack.getMinBufferSize(SPEAKER_RATE, CHANNEL_OUT, ENCODING)
-            audioTrack = AudioTrack.Builder()
-                .setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ASSISTANT)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                        .build()
-                )
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setEncoding(ENCODING)
-                        .setSampleRate(SPEAKER_RATE)
-                        .setChannelMask(CHANNEL_OUT)
-                        .build()
-                )
-                .setBufferSizeInBytes(maxOf(minBuf, 8192))
-                .setTransferMode(AudioTrack.MODE_STREAM)
-                .build()
-            audioTrack?.play()
+            try {
+                val minBuf = AudioTrack.getMinBufferSize(SPEAKER_RATE, CHANNEL_OUT, ENCODING)
+                if (minBuf <= 0) {
+                    Log.e(TAG, "AudioTrack unsupported: min buffer size=$minBuf")
+                    return
+                }
+                val track = AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ASSISTANT)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(ENCODING)
+                            .setSampleRate(SPEAKER_RATE)
+                            .setChannelMask(CHANNEL_OUT)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(maxOf(minBuf, 8192))
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build()
+                if (track.state != AudioTrack.STATE_INITIALIZED) {
+                    Log.e(TAG, "AudioTrack initialization failed")
+                    track.release()
+                    return
+                }
+                audioTrack = track
+                track.play()
+            } catch (e: Exception) {
+                Log.e(TAG, "startPlayback failed; voice output disabled", e)
+                try { audioTrack?.release() } catch (_: Exception) {}
+                audioTrack = null
+                return
+            }
         }
         if (!runPlayback) {
             runPlayback = true

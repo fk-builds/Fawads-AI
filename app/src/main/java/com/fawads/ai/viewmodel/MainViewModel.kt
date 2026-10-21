@@ -251,13 +251,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             set(Calendar.MILLISECOND, 0)
             if (timeInMillis <= System.currentTimeMillis()) add(Calendar.DAY_OF_YEAR, 1)
         }
-        TaskManager.scheduleReminder(app, cal.timeInMillis, "Alarm — aapka waqt ho gaya! ⏰", 5001)
+        TaskManager.addTask(app, "Alarm — aapka waqt ho gaya!", cal.timeInMillis)
         return "Alarm set ho gaya ${parts[0]}:${parts[1].toString().padStart(2, '0')} ⏰"
     }
 
     private fun setTimer(minutes: String): String {
-        val mins = minutes.toIntOrNull() ?: 1
-        TaskManager.scheduleTimer(app, mins * 60_000L, "Timer khatam! $mins minute ho gaye ⏳", 5002)
+        val mins = (minutes.toIntOrNull() ?: 1).coerceAtLeast(1)
+        val dueAt = System.currentTimeMillis() + mins * 60_000L
+        TaskManager.addTask(app, "Timer khatam! $mins minute ho gaye", dueAt)
         return "$mins minute ka timer laga diya ⏳"
     }
 
@@ -272,7 +273,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     set(Calendar.MILLISECOND, 0)
                     if (timeInMillis <= System.currentTimeMillis()) add(Calendar.DAY_OF_YEAR, 1)
                 }
-                TaskManager.scheduleReminder(app, cal.timeInMillis, message, 5003)
+                TaskManager.addTask(app, message, cal.timeInMillis)
                 return "Yaad dilaya jaayega: \"$message\""
             }
         }

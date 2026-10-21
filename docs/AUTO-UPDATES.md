@@ -94,3 +94,12 @@ bash scripts/phone-build.sh --bump
   jis ke paas key hai woh aap ke users ko "update" bhej sakta hai.
 - Ye tarah **sideload** hai: phone "unknown sources" warning dikhayega. Ye theek hai,
   lekin users ko pehle se bata dein.
+
+
+## v1.1.1 ke liye ads kyun band hain?
+
+Ads is release mein shamil nahi hain: `ADS_ENABLED=false` build flag future ke liye rakha gaya hai, magar AdMob/UMP SDK ya ad units add nahi kiye. Chhoti sideloaded app mein active users aur ad impressions ka bharosa nahi hota, is liye kamai ka andaza bharosemand nahi. Is app ki Accessibility Service doosri apps mein actions kar sakti hai; ad views ke qareeb automated taps invalid traffic ka risk ban sakte hain. Is risk aur user privacy ko dekhte hue ads ka faida justify nahi hota. Ads overlay, lock screen ya live call/voice session mein kabhi na dikhayein.
+
+## Build mein update feed URL set karna
+
+Release banate waqt public `release.json` ka direct URL Gradle ko dein: `./gradlew clean assembleRelease bundleRelease assembleDebug -PUPDATE_FEED_URL=https://HOST/path/release.json`. URL blank ho to app update ke liye phone-home nahi karti; user Settings → Updates mein apna feed URL daal sakta hai.

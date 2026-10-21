@@ -37,6 +37,7 @@ class FaceCamera(
         }, ContextCompat.getMainExecutor(previewView.context))
     }
 
+    @androidx.annotation.OptIn(androidx.camera.core.ExperimentalGetImage::class)
     private fun bind() {
         val provider = cameraProvider ?: return
         val preview = Preview.Builder().build().also {
