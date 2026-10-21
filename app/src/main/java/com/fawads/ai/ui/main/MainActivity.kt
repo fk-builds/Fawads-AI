@@ -10,15 +10,21 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.Settings
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.view.View
+import android.view.ViewGroup
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     private var liveConnectionStarted = false
     private var chatTurnInFlight = false
     private var lastApiKey: String? = null
+    private var lastSettingsSignature = ""
     private val pendingChatPrompts = mutableListOf<String>()
     private lateinit var taskAdapter: TaskAdapter
     private var inCallMode = false
@@ -109,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         prefs = Prefs(this)
         muted = prefs.isMuted
         lastApiKey = prefs.apiKey
+        lastSettingsSignature = settingsSignature()
         chatMessages.addAll(ChatHistoryStore.load(prefs))
         if (chatMessages.isEmpty()) chatMessages.add(ChatMessage("Sure, ${prefs.userName}. How can I help?", false))
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -171,7 +179,7 @@ class MainActivity : AppCompatActivity() {
     // ---------------------------- INIT ----------------------------
     private fun initViews() {
         chatAdapter = ChatAdapter(chatMessages)
-        binding.greetingText.text = "Good morning, ${prefs.userName} 👋"
+        binding.greetingText.text = personalizedGreeting()
         binding.topSubtitle.text = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
         binding.chatRecycler.layoutManager = LinearLayoutManager(this).apply { stackFromEnd = true }
         binding.chatRecycler.adapter = chatAdapter
@@ -199,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.startTalkingButton.setOnClickListener { startAssistant() }
         binding.talkActionButton.setOnClickListener { startAssistant() }
-        binding.callsToolButton.setOnClickListener { startAssistant() }
+        binding.callsToolButton.setOnClickListener { showCommunicationActions() }
         binding.liveInfoButton.setOnClickListener { openChatWithPrompt("Please share the latest useful weather and news information available to you.") }
         binding.homeSeeAllButton.setOnClickListener { showTasksScreen() }
         binding.homeNewTaskButton.setOnClickListener {
@@ -253,6 +261,24 @@ class MainActivity : AppCompatActivity() {
         applyMuteUi()
         refreshTasks()
         updateNavigation(Page.HOME)
+        installPressFeedback(binding.root)
+    }
+
+    private fun installPressFeedback(view: View) {
+        if (view.isClickable || view is android.widget.Button) {
+            view.setOnTouchListener { target, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        target.animate().scaleX(0.97f).scaleY(0.97f).setDuration(75).start()
+                        target.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                        target.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+                }
+                false
+            }
+        }
+        if (view is ViewGroup) for (i in 0 until view.childCount) installPressFeedback(view.getChildAt(i))
     }
 
     private fun showAssistantScreen() {
@@ -409,6 +435,44 @@ class MainActivity : AppCompatActivity() {
                     refreshTasks()
                     toast("Task saved")
                 }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showCommunicationActions() {
+        val actions = arrayOf("Open phone dialer", "Compose text message", "Open WhatsApp chat")
+        AlertDialog.Builder(this)
+            .setTitle("Calls & messages")
+            .setItems(actions) { _, which ->
+                val numberInput = EditText(this).apply {
+                    hint = "Phone number (include country code for WhatsApp)"
+                    inputType = android.text.InputType.TYPE_CLASS_PHONE
+                    setSingleLine(true)
+                    setPadding(24, 18, 24, 18)
+                }
+                AlertDialog.Builder(this)
+                    .setTitle(actions[which])
+                    .setView(numberInput)
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Continue") { _, _ ->
+                        val number = numberInput.text.toString().trim()
+                        if (number.isBlank()) {
+                            toast("Enter a phone number first")
+                            return@setPositiveButton
+                        }
+                        val intent = when (which) {
+                            0 -> Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}"))
+                            1 -> Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${Uri.encode(number)}"))
+                            else -> Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/${number.filter { it.isDigit() }}"))
+                        }
+                        try {
+                            startActivity(intent)
+                        } catch (_: Exception) {
+                            toast(if (which == 2) "WhatsApp or a browser is not available" else "No compatible phone app is available")
+                        }
+                    }
+                    .show()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -680,6 +744,8 @@ class MainActivity : AppCompatActivity() {
                             setActive(true)
                             status("Speaking…")
                             binding.orbView.setState(OrbAnimationView.State.SPEAKING)
+                            binding.waveformView.setAmplitude(0.58f)
+                            pulseVoiceHaptic()
                         }
                     }
                 }
@@ -688,10 +754,17 @@ class MainActivity : AppCompatActivity() {
                         if (currentPage == Page.VOICE) {
                             status("Listening…")
                             binding.orbView.setState(OrbAnimationView.State.LISTENING)
+                            binding.waveformView.setAmplitude(0.08f)
                         }
                     }
                 }
-                onAmplitudeChanged = { rms -> runOnUiThread { binding.waveformView.setAmplitude(rms) } }
+                onAmplitudeChanged = { rms ->
+                    runOnUiThread {
+                        val level = if (audioEngine?.isSpeaking == true) maxOf(0.42f, rms * 5f) else (rms * 8f).coerceIn(0f, 1f)
+                        binding.waveformView.setAmplitude(level)
+                        binding.orbView.setAmplitude(level)
+                    }
+                }
             }
         }
         audioEngine?.setMuted(muted)
@@ -701,6 +774,14 @@ class MainActivity : AppCompatActivity() {
             audioPlaybackStarted = true
         }
         applyMuteUi()
+    }
+
+    private fun pulseVoiceHaptic() {
+        if (!prefs.voiceHaptics || Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        runCatching {
+            val vibrator = getSystemService(Vibrator::class.java)
+            if (vibrator?.hasVibrator() == true) vibrator.vibrate(VibrationEffect.createOneShot(18, 48))
+        }
     }
 
     private fun flushTranscription() {
@@ -917,8 +998,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        binding.greetingText.text = personalizedGreeting()
         val currentKey = prefs.apiKey
-        if (lastApiKey != currentKey) {
+        val currentSettings = settingsSignature()
+        if (lastApiKey != currentKey || lastSettingsSignature != currentSettings) {
             if (chatTurnInFlight) {
                 chatMessages.lastOrNull { it.isUser }?.let { pendingChatPrompts.add(0, it.text) }
             }
@@ -932,6 +1015,7 @@ class MainActivity : AppCompatActivity() {
             audioPlaybackStarted = false
             assistantStarted = false
             lastApiKey = currentKey
+            lastSettingsSignature = currentSettings
         }
         if (currentPage == Page.VOICE && currentKey.isNotBlank()) {
             if (!assistantStarted) {
@@ -948,6 +1032,21 @@ class MainActivity : AppCompatActivity() {
             else binding.chatStatusText.text = "Set your Gemini API key in Menu → Settings to chat."
         }
         if (this::taskAdapter.isInitialized) refreshTasks()
+    }
+
+    private fun settingsSignature(): String = listOf(
+        prefs.userName, prefs.apiKey, prefs.geminiModel, prefs.geminiVoice,
+        prefs.personalityMode, prefs.handsFree, prefs.wakeWord
+    ).joinToString("|")
+
+    private fun personalizedGreeting(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val greeting = when {
+            hour < 12 -> "Good morning"
+            hour < 17 -> "Good afternoon"
+            else -> "Good evening"
+        }
+        return "$greeting, ${prefs.userName} 👋"
     }
 
     override fun onDestroy() {
